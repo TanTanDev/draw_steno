@@ -106,17 +106,17 @@ fn find_return(find: &str, input: &str) -> Result<TokenStop, ProccessedToken> {
     }
 }
 
-macro_rules! find_return {
-    ($input:expr, $($find:expr),* $(,)?) => {
-        $(
-            find_return($find, $input)?;
-        )*
+fn find_return_many(input: &str, finds: &[&str]) -> Result<(), ProccessedToken> {
+    for find in finds {
+        find_return(find, input)?;
     }
+    Ok(())
 }
 
 fn tokenise(input: &str) -> Result<TokenStop, ProccessedToken> {
-    find_return!(
+    find_return_many(
         input,
+        &[
         "stenografi",
         "br",
         "a",
@@ -150,7 +150,9 @@ fn tokenise(input: &str) -> Result<TokenStop, ProccessedToken> {
         "w",
         "x",
         "z",
-    );
+            ],
+    )?;
+
     Ok(TokenStop::EndOfWord)
 }
 
