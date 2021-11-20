@@ -21,7 +21,7 @@ enum Token {
     STENOGRAFI,
 }
 
-struct ProccessedToken {
+struct ProcessedToken {
     consumed_chars: usize,
     token: Option<Token>,
 }
@@ -45,7 +45,7 @@ pub struct VisualToken {
     end: SerializedVec2,
 }
 
-fn str_to_processed_token(input: &str) -> Result<TokenStop, ProccessedToken> {
+fn str_to_processed_token(input: &str) -> Result<TokenStop, ProcessedToken> {
     let len = input.len();
     let token = match input {
         "br" => Token::BR,
@@ -81,19 +81,19 @@ fn str_to_processed_token(input: &str) -> Result<TokenStop, ProccessedToken> {
         "stenografi" => Token::STENOGRAFI,
         //_ => return Ok(TokenStop::NoSuchCharacter),
         _ => {
-            return Err(ProccessedToken {
+            return Err(ProcessedToken {
                 consumed_chars: 1,
                 token: None,
             })
         }
     };
-    Err(ProccessedToken {
+    Err(ProcessedToken {
         consumed_chars: len,
         token: Some(token),
     })
 }
 
-fn find_return(find: &str, input: &str) -> Result<TokenStop, ProccessedToken> {
+fn find_return(find: &str, input: &str) -> Result<TokenStop, ProcessedToken> {
     if let Some(index) = input.find(find) {
         if index == 0 {
             str_to_processed_token(find)
@@ -106,51 +106,51 @@ fn find_return(find: &str, input: &str) -> Result<TokenStop, ProccessedToken> {
     }
 }
 
-fn find_return_many(input: &str, finds: &[&str]) -> Result<(), ProccessedToken> {
+fn find_return_many(input: &str, finds: &[&str]) -> Result<(), ProcessedToken> {
     for find in finds {
         find_return(find, input)?;
     }
     Ok(())
 }
 
-fn tokenise(input: &str) -> Result<TokenStop, ProccessedToken> {
+fn tokenise(input: &str) -> Result<TokenStop, ProcessedToken> {
     find_return_many(
         input,
         &[
-        "stenografi",
-        "br",
-        "a",
-        "e",
-        "i",
-        "e",
-        "i",
-        "o",
-        "u",
-        "y",
-        "å",
-        "ä",
-        "ö",
-        "b",
-        "c",
-        "d",
-        "f",
-        "g",
-        "h",
-        "j",
-        "k",
-        "l",
-        "m",
-        "n",
-        "p",
-        "q",
-        "r",
-        "s",
-        "t",
-        "v",
-        "w",
-        "x",
-        "z",
-            ],
+            "stenografi",
+            "br",
+            "a",
+            "e",
+            "i",
+            "e",
+            "i",
+            "o",
+            "u",
+            "y",
+            "å",
+            "ä",
+            "ö",
+            "b",
+            "c",
+            "d",
+            "f",
+            "g",
+            "h",
+            "j",
+            "k",
+            "l",
+            "m",
+            "n",
+            "p",
+            "q",
+            "r",
+            "s",
+            "t",
+            "v",
+            "w",
+            "x",
+            "z",
+        ],
     )?;
 
     Ok(TokenStop::EndOfWord)
