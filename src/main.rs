@@ -106,40 +106,51 @@ fn find_return(find: &str, input: &str) -> Result<TokenStop, ProccessedToken> {
     }
 }
 
+macro_rules! find_return {
+    ($input:expr, $($find:expr),* $(,)?) => {
+        $(
+            find_return($find, $input)?;
+        )*
+    }
+}
+
 fn tokenise(input: &str) -> Result<TokenStop, ProccessedToken> {
-    find_return("stenografi", input)?;
-    find_return("br", input)?;
-    find_return("a", input)?;
-    find_return("e", input)?;
-    find_return("i", input)?;
-    find_return("e", input)?;
-    find_return("i", input)?;
-    find_return("o", input)?;
-    find_return("u", input)?;
-    find_return("y", input)?;
-    find_return("å", input)?;
-    find_return("ä", input)?;
-    find_return("ö", input)?;
-    find_return("b", input)?;
-    find_return("c", input)?;
-    find_return("d", input)?;
-    find_return("f", input)?;
-    find_return("g", input)?;
-    find_return("h", input)?;
-    find_return("j", input)?;
-    find_return("k", input)?;
-    find_return("l", input)?;
-    find_return("m", input)?;
-    find_return("n", input)?;
-    find_return("p", input)?;
-    find_return("q", input)?;
-    find_return("r", input)?;
-    find_return("s", input)?;
-    find_return("t", input)?;
-    find_return("v", input)?;
-    find_return("w", input)?;
-    find_return("x", input)?;
-    find_return("z", input)?;
+    find_return!(
+        input,
+        "stenografi",
+        "br",
+        "a",
+        "e",
+        "i",
+        "e",
+        "i",
+        "o",
+        "u",
+        "y",
+        "å",
+        "ä",
+        "ö",
+        "b",
+        "c",
+        "d",
+        "f",
+        "g",
+        "h",
+        "j",
+        "k",
+        "l",
+        "m",
+        "n",
+        "p",
+        "q",
+        "r",
+        "s",
+        "t",
+        "v",
+        "w",
+        "x",
+        "z",
+    );
     Ok(TokenStop::EndOfWord)
 }
 
