@@ -2,6 +2,9 @@ use serde::{Deserialize, Serialize};
 use strum::IntoEnumIterator;
 use strum_macros::{AsRefStr, EnumIter};
 
+type StenoWord = Vec<Token>;
+type StenoSentence = Vec<StenoWord>;
+
 #[rustfmt::skip]
 #[derive(Copy, Clone, Debug, Hash, EnumIter, Eq, PartialEq, AsRefStr, Serialize, Deserialize)]
 enum Token {
@@ -27,7 +30,6 @@ struct ProccessedToken {
 }
 
 enum TokenStop {
-    NoSuchCharacter,
     EndOfWord,
     NoMatchContinue,
 }
@@ -79,7 +81,6 @@ fn str_to_processed_token(input: &str) -> Result<TokenStop, ProccessedToken> {
         "x" => Token::X,
         "z" => Token::Z,
         "stenografi" => Token::STENOGRAFI,
-        //_ => return Ok(TokenStop::NoSuchCharacter),
         _ => {
             return Err(ProccessedToken {
                 consumed_chars: 1,
@@ -143,9 +144,6 @@ fn tokenise(input: &str) -> Result<TokenStop, ProccessedToken> {
     Ok(TokenStop::EndOfWord)
 }
 
-type StenoWord = Vec<Token>;
-type StenoSentence = Vec<StenoWord>;
-
 fn parse(input: &str) -> Result<StenoSentence, ()> {
     let input = input.to_lowercase();
     let input_words = input.split(' ');
@@ -164,7 +162,6 @@ fn parse(input: &str) -> Result<StenoSentence, ()> {
                 }
                 Ok(err) => {
                     match err {
-                        TokenStop::NoSuchCharacter => return Err(()),
                         TokenStop::EndOfWord => break,
                         TokenStop::NoMatchContinue => (),
                     };
@@ -181,7 +178,6 @@ use macroquad::prelude::*;
 use std::{collections::HashMap, fmt::Debug, hash::Hash, io::Write};
 async fn load_textures(library: &Vec<VisualToken>) -> HashMap<Token, Texture2D> {
     let mut textures = HashMap::new();
-    //for token in Token::iter() {
     for visual_token in library {
         let token_name = visual_token.token.as_ref().to_lowercase();
         let file_name = format!("res/{}.png", token_name);
