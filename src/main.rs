@@ -1,11 +1,15 @@
+use macroquad::prelude::*;
 use serde::{Deserialize, Serialize};
-use strum::IntoEnumIterator;
 use strum_macros::{AsRefStr, EnumIter};
+
+use std::{collections::HashMap, fmt::Debug, hash::Hash, io::Write};
 
 type StenoWord = Vec<Token>;
 type StenoSentence = Vec<StenoWord>;
+const START_POS: Vec2 = const_vec2!([60f32, 180f32]);
 
 #[rustfmt::skip]
+#[allow(clippy::upper_case_acronyms)] // I want json naming convention for enum to be all upper case
 #[derive(Copy, Clone, Debug, Hash, EnumIter, Eq, PartialEq, AsRefStr, Serialize, Deserialize)]
 enum Token {
     // vocals
@@ -165,7 +169,7 @@ fn parse(input: &str) -> Result<StenoSentence, ()> {
         let mut steno_word = Vec::new();
         let mut char_index = 0;
         loop {
-            let token_result = tokenise(word.split_at(char_index - 0).1);
+            let token_result = tokenise(word.split_at(char_index).1);
             match token_result {
                 Err(proccessed_token) => {
                     char_index += proccessed_token.consumed_chars;
@@ -186,10 +190,7 @@ fn parse(input: &str) -> Result<StenoSentence, ()> {
     Ok(sentence)
 }
 
-use macroquad::prelude::*;
-
-use std::{collections::HashMap, fmt::Debug, hash::Hash, io::Write};
-async fn load_textures(library: &Vec<VisualToken>) -> HashMap<Token, Texture2D> {
+async fn load_textures(library: &[VisualToken]) -> HashMap<Token, Texture2D> {
     let mut textures = HashMap::new();
     for visual_token in library {
         let token_name = visual_token.token.as_ref().to_lowercase();
@@ -222,7 +223,6 @@ async fn main() {
     };
     let textures = load_textures(&library).await;
 
-    //let parsed_text = parse("nu ä d dags f e lit medelande").unwrap();
     let mut text_input = String::new();
     loop {
         clear_background(WHITE);
@@ -261,12 +261,10 @@ async fn main() {
     }
 }
 
-const START_POS: Vec2 = const_vec2!([60f32, 180f32]);
-
 fn draw_steno(
-    parsed_steno: &StenoSentence,
+    parsed_steno: &[StenoWord],
     textures: &HashMap<Token, Texture2D>,
-    lib: &Vec<VisualToken>,
+    lib: &[VisualToken],
 ) {
     let max_word_height = 330f32;
     let average_word_width = 290f32;
@@ -281,7 +279,7 @@ fn draw_steno(
     let mut current_line = 0;
     for word_tokens in parsed_steno.iter() {
         for token in word_tokens {
-            let texture = textures.get(&token).unwrap();
+            let texture = textures.get(token).unwrap();
             let token_data = lib.iter().find(|vt| vt.token == *token).unwrap();
             let pivot = vec2(-token_data.start.x, -token_data.start.y);
             draw_texture(*texture, position.x + pivot.x, position.y + pivot.y, BLACK);
