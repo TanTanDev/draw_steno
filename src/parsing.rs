@@ -26,13 +26,13 @@ pub struct VisualToken {
 }
 
 // iterates all possible tokens in decleration order, to convert the input str to a token
-fn tokenise(input: &str) -> Result<(), ProcessedToken> {
+fn tokenise(input: &str) -> Option<ProcessedToken> {
     for token in Token::iter() {
         let token_str = token.as_ref();
         if let Some(index) = input.find(token_str) {
             if index == 0 {
                 if let Ok(token) = Token::from_str(token_str) {
-                    return Err(ProcessedToken {
+                    return Some(ProcessedToken {
                         consumed_chars: token_str.len(),
                         token,
                     });
@@ -40,7 +40,7 @@ fn tokenise(input: &str) -> Result<(), ProcessedToken> {
             }
         }
     }
-    Ok(())
+    None
 }
 
 pub fn parse(input: &str) -> Result<StenoSentence, ()> {
@@ -50,7 +50,7 @@ pub fn parse(input: &str) -> Result<StenoSentence, ()> {
     for word in input_words {
         let mut tokens = Vec::new();
         let mut char_index = 0;
-        while let Err(proccessed_token) = tokenise(word.split_at(char_index).1) {
+        while let Some(proccessed_token) = tokenise(word.split_at(char_index).1) {
             char_index += proccessed_token.consumed_chars;
             tokens.push(proccessed_token.token);
         }
